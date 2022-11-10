@@ -1,0 +1,2 @@
+# BrowserX
+browser settings
