@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.2
 // @description  清理常用网站的推广信息
-// @description  由于知乎对其页面使用了 Content-Security-Policy，且由于safari的限制，safari中无法使用知乎不分的优化
+// @description  由于知乎对其页面使用了 Content-Security-Policy，且由于safari的限制，safari中无法使用知乎部分的优化
 // @author       layton
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @match        *://*.csdn.net/*
@@ -177,9 +177,13 @@
 
         // 关闭推荐列表自动播放
         let recListAutoPlayOff = setInterval(()=> {
-            if ($("span.switch-button") != undefined && $("span.switch-button").className == "switch-button on") {
-                $("span.switch-button").click();
+
+            if ($("span.switch-button") != undefined && $("span.switch-button").className == "switch-button") {
                 window.clearInterval(recListAutoPlayOff);
+            } else {
+                if ($("span.switch-button") != undefined) {
+                    $("span.switch-button").click();
+                }
             }
         }, 800)
 
