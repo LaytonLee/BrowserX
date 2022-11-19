@@ -2,13 +2,14 @@
 // @name         web page cleaner
 // @namespace    http://tampermonkey.net/
 // @version      0.2
-// @description  清理常用网站的推广信息
-// @description  由于知乎对其页面使用了 Content-Security-Policy，且由于safari的限制，safari中无法使用知乎部分的优化
+// @description  清理常用网站的推广信息（由于知乎对其页面使用了 Content-Security-Policy，且由于safari的限制，safari中无法使用知乎部分的优化）
 // @author       layton
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @match        *://*.csdn.net/*
 // @match        *://*.zhihu.com/*
 // @match        *://*.bilibili.com/*
+// @match        *://*.dmh8.me/*
+// @match        *://*.yxdmlove.com/*
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAiCAYAAABbXymAAAAACXBIWXMAAAPYAAAD 2AFuR2M1AAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAA7RJ REFUSIm11l+IVFUcwPHv79wzd+/s7L07K8OuioWhKQlBtaQEPkQPkg8VgqHmg/15 MfChCHoQeu4pDCIJo0hQ2UIqkgR1pSXojz2YDFo4ySbuiuLsts7M7uzszJzz66Hd dZddLW38PV04v/Phd37n3HOvqCr3I8y/JRzLy0P9Z4N9A2dkRcvggcsSichRZ/zr 3vJsy+AbU3zgjA47w3kHV+aO/Xpa1oHIXcOHBu0rTnhGM+xy8KCGt+D8ScmQ4scL A3Lhj1Oy4z/D+y/LY01x7znDizdGqXsrOZShmfGJmO0ukD/VyJcukAODp0z/WL90 3hE+feXdddZ2nFiuu8+v9xf3bYi/GUQ6WRldHC8UClooFEoSPrI/zLzVnur5LSe5 g+84Y1fcbPDJXMfOPBQKhc0q+vb1dP/TUzJO2fzeXZKfgQZGls9OqLvzSV2H6Grf uUaQNUQb0GVfeT/8/NpLZz/aufqJ3YcBbD6fz6TT6c+ArRejA1TsEOsnjnDVHiEf vka6GdOlvbNw2X1BFL6A0D6nvIeNS3VjbOZQoVB4Lo7jV20URe+r6tbrbT9xIfMx m8Y+J3ar6HK91ORNLgV7sbIUFDzjlPwxHgj7FuyLN02QEGBbpVIpGWA7QLtbxsby h8Ru1WxypCuw0k2KpQDc1GPYYC2hWTsfbV6mqSVIrQZARHYYa60CJM2V9NQ3LKik aq4STve4SB+dwbYFOY2poxA9BSYGIAgCNdlstmyMue2F0ZQmoS6jwjlqco1ENs8f d4NMTh0m6NgNgDFGs9lsxVhrr+VyuYl0Ot1YDH6y1kesjzIWfE/dTDDEXir6HXU/ SLV5nNHqy6SilwjCXtLpdCOXy01Ya69JqVQ6DmwE8N5LrVaz9XrdNhqNwDk375Ut yxlG6KPaHCDlJmlzMT1te3xPdk89itLNOSv/Qcrl8kFV3bJYtaoqzjnx3ov3XmaW qlJDpaxtttsL4YJ5IvK19d4X5TZ3iYjozObOjxBIFp0zHSMGKN4p4x6jaFS15bD3 ftQEQdByWFWLRlVv3Ad45L60wlpbNJ2dnS2vmOlTMS4iky1EXRzHYwb+6UkL4b8A NwO3ss9FmP7mGWNa1mcRuQW3uOKRWRhoWcXe+1uw937ozul3FaNz4ZMiUmuFKiL5 WXjJkiXDqvoG4P+neyZJkhOzMECSJEdEZDNw7h7AJvBpkiRbAAcgi/14V6vVxxuN xiZjTK+qrgZyIpJR1RRwU0SqqjoMFETkFxH5tqOjY97J+huvtpXCworV2wAAAABJ RU5ErkJggg==
 // @grant        GM_addStyle
 // ==/UserScript==
@@ -26,6 +27,18 @@
         // 获取主域名
         let mainDomain = getMainDomain(domain);
 
+        // 域名-网站映射
+        let domainMap = new Map([
+            ["baidu.com", "baidu"],
+            ["csdn.net", "csdn"],
+            ["zhihu.com", "zhihu"],
+            ["bilibili.com", "bilibili"],
+            ["dmh8.me", "yhdm"],
+            ["yxdmlove.com", "yxdm"],
+            ["yxdm.tv", "yxdm"]
+        ]);
+
+        // 根据域名过滤广告
         switch(mainDomain) {
             case "csdn.net":
                 csdnCleaner();
@@ -36,6 +49,12 @@
             case "bilibili.com":
                 bilibiliCleaner();
                 break;
+            case "dmh8.me":
+                yhdmCleaner();
+                break;
+            case "yxdmlove.com":
+                yxdmCleaner();
+                break;
         }
     }
 
@@ -43,7 +62,7 @@
     * 获取主域名
     */
     function getMainDomain(domain) {
-        let re = new RegExp(/[\w]+\.((com\.cn)|(org\.cn)|(net\.cn)|com|net|org|gov|cc|biz|info|cn|co)/g);
+        let re = new RegExp(/[\w]+\.((com\.cn)|(org\.cn)|(net\.cn)|com|net|org|gov|cc|biz|info|cn|co|me)/g);
         let mainDomain = domain.match(re)[0];
         return mainDomain;
     }
@@ -197,6 +216,38 @@
                 }
             }
         }, 800);
+    }
 
+    /**
+    * yhdm cleaner
+    */
+    function yhdmCleaner(){
+
+        // 移除播放页广告
+        let adOff = setInterval(()=>{
+            if ($("img:not([class])").length > 0) {
+                $("img:not([class])").parent().remove();
+                window.clearInterval(adOff);
+            }
+        }, 800)
+
+        // 关闭播放页底部横幅广告
+        //closeBottomFixed()
+    }
+
+    /**
+    * yxdm cleaner
+    */
+    function yxdmCleaner() {
+        GM_addStyle(`
+            .adv1 {
+                visibility: hidden;
+                height: 0;
+            }
+            #HMRichBox {
+                visibility: hidden;
+                height: 0;
+            }
+        `);
     }
 })();
